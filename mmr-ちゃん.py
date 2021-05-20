@@ -6,6 +6,7 @@ import discord
 import json
 from discord.ext import commands
 from dotenv import load_dotenv
+from riotwatcher import LolWatcher, ApiError
 
 load_dotenv()
 TOKEN = os.getenv('MMR_DISCORD_TOKEN')
@@ -23,6 +24,14 @@ def parse_summary(summary):
     cleantext = re.sub(cleanr, '', summary)
     return cleantext
 
+def get_summoner(summoner):
+    api_key = os.getenv('TEMP_RIOT_KEY')
+    watcher = LolWatcher(api_key)
+    my_region = 'na1'
+    me = watcher.summoner.by_name(my_region, summoner)
+    return watcher.league.by_summoner(my_region, me['id'])
+
+
 @client.command(name='mmr')
 async def mmr_request(ctx):
     summonername = str(ctx.message.content)[5:]
@@ -34,6 +43,12 @@ async def mmr_request(ctx):
     if avg == "None":
         await ctx.send(summonername + " hasn't played any ranked games recently")
     else:
-        response = "MMR: " + str(json_data["ranked"]["avg"]) + " ± " + str(json_data["ranked"]["err"]) +"\n" + parse_summary(json_data["ranked"]["summary"])
+        print("______________________________________________________________________________________")
+        print(summonername)
+        about_summoner = get_summoner(summonername)
+        soloduo = about_summoner[0]
+        print(soloduo)
+        print("______________________________________________________________________________________")
+        response = "Summoner: " + summonername + "\nTier: " + str(soloduo["tier"]) + " " +  str(soloduo["rank"]) + "\nLP: " + str(soloduo["leaguePoints"]) + "\nMMR: " + str(json_data["ranked"]["avg"]) + " ± " + str(json_data["ranked"]["err"]) +"\n" + parse_summary(json_data["ranked"]["summary"]) + "\nWin rate: " + str(round(100 * (soloduo["wins"]/(soloduo["wins"] + soloduo["losses"])), 2)) + "%"
         await ctx.send(response)
 client.run(TOKEN)

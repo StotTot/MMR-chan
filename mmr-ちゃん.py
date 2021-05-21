@@ -46,13 +46,17 @@ async def mmr_request(ctx):
         print("______________________________________________________________________________________")
         print(summonername)
         about_summoner = get_summoner(summonername)
+        print(about_summoner)
         index = -1
         for i in range(len(about_summoner)):
             if "RANKED_SOLO_5x5" in about_summoner[i]:
-                index = 1
+                index = i
+                break
         soloduo = about_summoner[index]
         print(soloduo)
         print("______________________________________________________________________________________")
         response = "```\nSummoner: " + summonername + "\nTier: " + str(soloduo["tier"]) + " " +  str(soloduo["rank"]) + "\nLP: " + str(soloduo["leaguePoints"]) + "\nMMR: " + str(json_data["ranked"]["avg"]) + " ± " + str(json_data["ranked"]["err"]) +"\n" + parse_summary(json_data["ranked"]["summary"]) + "\nWin rate: " + str(round(100 * (soloduo["wins"]/(soloduo["wins"] + soloduo["losses"])), 2)) + "%\n```"
         await ctx.send(response)
+
+
 client.run(TOKEN)

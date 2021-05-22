@@ -49,7 +49,7 @@ async def mmr_request(ctx):
         print(about_summoner)
         index = -1
         for i in range(len(about_summoner)):
-            if "RANKED_SOLO_5x5" in about_summoner[i]:
+            if "RANKED_SOLO_5x5" in about_summoner[i].values():
                 index = i
                 break
         soloduo = about_summoner[index]
